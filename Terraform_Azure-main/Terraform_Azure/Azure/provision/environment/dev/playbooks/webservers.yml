@@ -1,0 +1,28 @@
+---
+- hosts: webserver
+  become: true 
+  tasks:
+  - name: install python
+    package: name=python state=present
+  - name: install apache webservers
+    package: name=apache2  state=present
+    become_user: root
+  - name: start apache
+    systemd: name=apache2 state=started
+  - name: copy index file
+    copy: src=index.html dest=/var/www/html/index.html
+  handlers:
+  - name: restart apache
+    service: name=apache state=restarted
+    become_user: root
+
+- hosts: webserver
+  become: true
+  tasks:
+  - name: install mySql
+    package: name=mysql-server state=present
+  - name: start mySql
+    systemd: name=mysql state=started
+  #- name: Deploy Apache configuration file
+  #  copy: src=/ansible/files/conf/httpd.conf
+  #        dest=/etc/httpd/conf
